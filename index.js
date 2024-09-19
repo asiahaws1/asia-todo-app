@@ -18,6 +18,25 @@ let todos = [
 
 let categories = ['School', 'Work', 'Rest'];  
 
+// add a to do
+function addTodo() {
+    const input = document.getElementById('todo-input');
+    const newName = input.value;
+
+    if (!newName) return;
+
+    const newTodo = {
+        id: todos.length + 1,
+        name: newName,
+        satus: 'Pending',
+        category: 'Personal',
+        dueDate: 'Pending'
+    }
+    todos.push(newTodo);
+    input.value = '';
+    renderTodos();
+}
+
 function editTodo(id, newValues) {
    
     const todo = todos.find(todo => todo.id === id);
