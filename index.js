@@ -28,7 +28,7 @@ function addTodo() {
     const newTodo = {
         id: todos.length + 1,
         name: newName,
-        satus: 'Pending',
+        status: 'Pending',
         category: 'Personal',
         dueDate: 'Pending'
     }
