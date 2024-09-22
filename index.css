@@ -14,7 +14,7 @@ body {
   padding: 15px;
   margin-bottom: 20px;
   display: flex;
-
+ 
   justify-content: space-between;
   align-items: flex-start;
 }
@@ -23,11 +23,12 @@ body {
 .todo-item strong {
   font-size: 20px;
   margin-bottom: 10px;
+  color: #215f74;
 }
 
 .todo-item span {
   font-size: 16px;
-  color: #555;
+  color: #215f74;
   margin-bottom: 10px;
 }
 
@@ -98,7 +99,7 @@ input[type="text"] {
 
 h1, h2 {
   font-family: 'Roboto', sans-serif;
-  font-weight: 500;
+  font-weight: 300;
   color: #333;
 }
 
