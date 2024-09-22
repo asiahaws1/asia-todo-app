@@ -136,6 +136,8 @@ function clearCompletedTodos() {
 }
 
 
+
+
 function addTodo() {
     const input = document.getElementById('todo-input');
     const newName = input.value;
@@ -152,6 +154,13 @@ function addTodo() {
     todos.push(newTodo);
     input.value = ''; 
     renderTodos();
+
+    document.getElementById('todo-input').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            addTodo();
+        }
+    });
+    
 }
 // this renders them
 renderTodos();
