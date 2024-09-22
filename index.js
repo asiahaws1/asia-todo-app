@@ -4,7 +4,7 @@ let todos = [
      category: 'Personal',
       dueDate: 'Tonight' },
     { id: 2, name: 'Meet with Stakeholders',
-     status: 'Done',
+     status: 'Pending',
       category: 'Work',
        dueDate: 'Tomorrow' }
 ];
@@ -77,14 +77,20 @@ function renderTodos() {
         deleteBtn.textContent = 'Delete';
         deleteBtn.onclick = () => deleteTodoItem(todo.id);
 
-        
+        const completeBtn = document.createElement('button');
+        completeBtn.textContent = todo.status === 'Pending' ? 'Complete' : 'Undo';
+        completeBtn.onclick = () => toggleComplete(todo.id);
+
         todoElement.appendChild(todoContent);
         todoElement.appendChild(editForm);
         todoElement.appendChild(editBtn);
         todoElement.appendChild(deleteBtn);
+        todoElement.appendChild(completeBtn); 
 
         todoList.appendChild(todoElement);
     });
+
+    updateTodoCount(); 
 }
 
 
@@ -111,6 +117,24 @@ function deleteTodoItem(id) {
     renderTodos();
 }
 
+function toggleComplete(id) {
+    const todo = todos.find(todo => todo.id === id);
+    if (todo) {
+        todo.status = todo.status === 'Pending' ? 'Completed' : 'Pending';
+    }
+    renderTodos();
+}
+
+function updateTodoCount() {
+    const pendingCount = todos.filter(todo => todo.status === 'Pending').length;
+    document.getElementById('todo-count').textContent = `Todos left: ${pendingCount}`;
+}
+
+function clearCompletedTodos() {
+    todos = todos.filter(todo => todo.status === 'Pending');
+    renderTodos();
+}
+
 
 function addTodo() {
     const input = document.getElementById('todo-input');
@@ -122,13 +146,12 @@ function addTodo() {
         name: newName,
         status: 'Pending',
         category: 'Personal',
-        dueDate: 'Pending'
+        dueDate: 'Add A Due Dae'
     };
 
     todos.push(newTodo);
     input.value = ''; 
     renderTodos();
-}
-
+}te
 // this renders them
 renderTodos();
