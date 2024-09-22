@@ -1,28 +1,120 @@
-// make an array to store the memory 
 let todos = [
-    {
-        id: 1,
-        name: 'Feed Dog',
-        status: 'Pending',  
-        category: 'Personal',
-        dueDate: 'Tonight'
-    },
-    {
-        id: 2,
-        name: 'Meet with Stakeholders',
-        status: 'Done',
-        category: 'Work',
-        dueDate: 'Tomorrow'
-    }
+    { id: 1, name: 'Feed Dog', 
+    status: 'Pending',
+     category: 'Personal',
+      dueDate: 'Tonight' },
+    { id: 2, name: 'Meet with Stakeholders',
+     status: 'Done',
+      category: 'Work',
+       dueDate: 'Tomorrow' }
 ];
 
-let categories = ['School', 'Work', 'Rest'];  
 
-// add a to do
+function renderTodos() {
+    const todoList = document.getElementById('todo-list');
+    todoList.textContent = ''; 
+
+    todos.forEach(todo => {
+        const todoElement = document.createElement('div');
+        todoElement.classList.add('todo-item');
+        todoElement.dataset.id = todo.id;
+
+      
+        const todoContent = document.createElement('div');
+        todoContent.classList.add('todo-content');
+
+        const todoName = document.createElement('strong');
+        todoName.textContent = todo.name;
+
+        const todoDetails = document.createElement('span');
+        todoDetails.textContent = ` - ${todo.status} - ${todo.category} - Due: ${todo.dueDate}`;
+
+        todoContent.appendChild(todoName);
+        todoContent.appendChild(todoDetails);
+
+        // i am using a dom element in order to do this and arrow functions
+        const editForm = document.createElement('div');
+        editForm.classList.add('todo-edit-form');
+        editForm.style.display = 'none';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = todo.name;
+
+        const statusInput = document.createElement('input');
+        statusInput.type = 'text';
+        statusInput.value = todo.status;
+
+        const categoryInput = document.createElement('input');
+        categoryInput.type = 'text';
+        categoryInput.value = todo.category;
+
+        const dueDateInput = document.createElement('input');
+        dueDateInput.type = 'text';
+        dueDateInput.value = todo.dueDate;
+
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Save';
+        saveBtn.onclick = () => saveEdit(todo.id, nameInput, statusInput, categoryInput, dueDateInput);
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.onclick = () => toggleEditForm(todoElement);
+
+        editForm.appendChild(nameInput);
+        editForm.appendChild(statusInput);
+        editForm.appendChild(categoryInput);
+        editForm.appendChild(dueDateInput);
+        editForm.appendChild(saveBtn);
+        editForm.appendChild(cancelBtn);
+
+       
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => toggleEditForm(todoElement);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteTodoItem(todo.id);
+
+        
+        todoElement.appendChild(todoContent);
+        todoElement.appendChild(editForm);
+        todoElement.appendChild(editBtn);
+        todoElement.appendChild(deleteBtn);
+
+        todoList.appendChild(todoElement);
+    });
+}
+
+
+function toggleEditForm(todoElement) {
+    const editForm = todoElement.querySelector('.todo-edit-form');
+    const isEditing = editForm.style.display === 'block';
+    editForm.style.display = isEditing ? 'none' : 'block';
+}
+
+function saveEdit(id, nameInput, statusInput, categoryInput, dueDateInput) {
+    const todo = todos.find(todo => todo.id === id);
+    if (todo) {
+        todo.name = nameInput.value;
+        todo.status = statusInput.value;
+        todo.category = categoryInput.value;
+        todo.dueDate = dueDateInput.value;
+    }
+    renderTodos(); 
+}
+
+
+function deleteTodoItem(id) {
+    todos = todos.filter(todo => todo.id !== id);
+    renderTodos();
+}
+
+
 function addTodo() {
     const input = document.getElementById('todo-input');
     const newName = input.value;
-
     if (!newName) return;
 
     const newTodo = {
@@ -31,72 +123,12 @@ function addTodo() {
         status: 'Pending',
         category: 'Personal',
         dueDate: 'Pending'
-    }
+    };
+
     todos.push(newTodo);
-    input.value = '';
+    input.value = ''; 
     renderTodos();
 }
 
-function editTodo(id, newValues) {
-   
-    const todo = todos.find(todo => todo.id === id);
-
-   
-    todo.name = newValues.name || todo.name;
-    todo.status = newValues.status || todo.status;
-    todo.category = newValues.category || todo.category;
-    todo.dueDate = newValues.dueDate || todo.dueDate;
-
-    console.log(`Your task ${id} has been successfully updated!`);
-    renderTodos(); 
-}
-
-
-
-function renderTodos() {
-    const todoList = document.getElementById('todo-list');
-    todoList.innerHTML = '';  
-
-    todos.forEach(todo => {
-        const todoElement = document.createElement('div');
-        todoElement.classList.add('todo-item');
-        todoElement.innerHTML = `
-            <strong>${todo.name}</strong> - ${todo.status} - ${todo.category} - Due: ${todo.dueDate}
-            <button onclick="editTodoPrompt(${todo.id})">Edit</button>
-            <button onclick="deleteTodoPrompt(${todo.id})">Delete</button>
-        `;
-        todoList.appendChild(todoElement);
-    });
-}
-
-// edit the to do //prompt makes ask the user a question
-function editTodoPrompt(id) {
-    const newName = prompt('Please enter your task name:');
-    const newStatus = prompt('Please add your task status:');
-    const newCategory = prompt('Add a new category');
-    const newDueDate = prompt('Enter a due date for your task:');
-    editTodo(id, {
-        name: newName,
-        status: newStatus,
-        category: newCategory,
-        dueDate: newDueDate
-    });
-}
-
-// do you want to delete this task?
-function deleteTodoPrompt(id) {
-    if (confirm('Delete this task?')) {
-        deleteTodo(id);
-    }
-}
-function deleteTodo(id) {
-    todos = todos.filter(todo => todo.id !== id);
-    console.log(`Todo with ID ${id} has been deleted.`);
-    renderTodos();
-}
-
-
-
-
+// this renders them
 renderTodos();
-// this renders them 
