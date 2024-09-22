@@ -146,12 +146,12 @@ function addTodo() {
         name: newName,
         status: 'Pending',
         category: 'Personal',
-        dueDate: 'Add A Due Dae'
+        dueDate: 'Add A Due Date'
     };
 
     todos.push(newTodo);
     input.value = ''; 
     renderTodos();
-}te
+}
 // this renders them
 renderTodos();
