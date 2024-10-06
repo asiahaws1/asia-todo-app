@@ -1,27 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="index.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
-  <title>Asia's To Do App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Asia's To Do App</title>
 </head>
 <body>
-  <h1>Asia's To Do App</h1>
-  
-  <input type="text" id="todo-input" placeholder="Add a new task">
-  <button onclick="addTodo()">Add a To-Do</button>
-  <h2>Your current tasks:</h2>
-  <div id="todo-list"></div>
-  
-  <div id="todo-count"></div> 
-  
-  <button onclick="clearCompletedTodos()">Clear Completed Tasks</button> 
-  
-  <script src="index.js"></script>
+    <div id="app">
+        <h1>Asia's To Do App</h1>
+
+        <div>
+            <input type="text" id="todo-input" placeholder="Add A New To Do Here!" />
+            <select id="category-select">
+                <option value="Personal">Personal</option>
+                <option value="Work">Work</option>
+                <option value="Other">Other</option>
+            </select>
+            <button onclick="addTodo()">Add A New To Do</button>
+        </div>
+
+        <div>
+            <h2>Todos</h2>
+            <div id="todo-list"></div>
+            <div id="todo-count"></div>
+            <button id="clear-completed-btn">Clear Completed Todos</button>
+            <select id="category-filter">
+                <option value="All">All Categories</option>
+                <option value="Personal">Personal</option>
+                <option value="Work">Work</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div>
+            <h2>Categories</h2>
+            <div id="category-list"></div>
+            <input type="text" id="new-category-input" placeholder="Add a new category" />
+            <button onclick="addCategory()">Add Category</button>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
 </body>
 </html>
