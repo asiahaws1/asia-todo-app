@@ -240,6 +240,9 @@ document.getElementById('add-todo-btn').addEventListener('click', () => {
     addTodo();
 });
 
+document.getElementById('clear-completed-btn').addEventListener('click', () => {
+    clearCompletedTodos();
+});
 
 document.getElementById('todo-input').addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
