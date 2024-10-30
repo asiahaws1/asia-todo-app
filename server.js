@@ -1,16 +1,12 @@
 const express = require('express');
-const app = express();
-app.use(express.json());
-
 const cors = require('cors');
+const path = require('path');
+const app = express();
+
+
+app.use(express.json());
 app.use(cors());
-
-
-app.use(express.static('public'));
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 let todos = [
@@ -21,10 +17,14 @@ let todos = [
 let categories = ['Personal', 'Work'];
 
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
 app.get('/api/todos', (req, res) => {
     res.json(todos);
 });
-
 
 app.post('/api/todos', (req, res) => {
     const newTodo = {
@@ -35,7 +35,6 @@ app.post('/api/todos', (req, res) => {
     res.json(newTodo);
 });
 
-
 app.put('/api/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const index = todos.findIndex(todo => todo.id === id);
@@ -45,7 +44,6 @@ app.put('/api/todos/:id', (req, res) => {
     todos[index] = { ...todos[index], ...req.body };
     res.json(todos[index]);
 });
-
 
 app.delete('/api/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -67,7 +65,6 @@ app.get('/api/categories', (req, res) => {
     res.json(categories);
 });
 
-
 app.post('/api/categories', (req, res) => {
     if (!req.body.category) {
         return res.status(400).json({ message: 'Need category name' });
@@ -75,7 +72,6 @@ app.post('/api/categories', (req, res) => {
     categories.push(req.body.category);
     res.json({ category: req.body.category });
 });
-
 
 app.put('/api/categories/:index', (req, res) => {
     const index = parseInt(req.params.index);
@@ -100,4 +96,4 @@ app.delete('/api/categories/:index', (req, res) => {
 });
 
 const PORT = 3003;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}. Visit http://localhost:${PORT}`));

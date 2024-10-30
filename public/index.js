@@ -219,10 +219,10 @@ function renderCategories() {
 function updateCategorySelects() {
     const categoryFilter = document.getElementById('category-filter');
     const categorySelect = document.getElementById('category-select');
-    
+
     categoryFilter.innerHTML = '<option value="All">All</option>';
     categorySelect.innerHTML = '';
-    
+
     categories.forEach(category => {
         const filterOption = document.createElement('option');
         filterOption.value = category;
@@ -275,17 +275,17 @@ function toggleEditCategory(index) {
     const categoryElement = document.querySelectorAll('.category-item')[index];
     const categoryName = categoryElement.querySelector('span');
     const currentName = categoryName.textContent;
-    
+
     const input = document.createElement('input');
     input.type = 'text';
     input.value = currentName;
-    
+
     input.onblur = () => {
         categories[index] = input.value;
         saveCategoriesToLocalStorage();
         renderCategories();
     };
-    
+
     categoryName.replaceWith(input);
     input.focus();
 }
@@ -300,7 +300,7 @@ function deleteCategory(index) {
 document.getElementById('add-category-btn').addEventListener('click', () => {
     const input = document.getElementById('new-category-input');
     const newCategory = input.value.trim();
-    
+
     if (newCategory) {
         categories.push(newCategory);
         saveCategoriesToLocalStorage();
@@ -315,6 +315,8 @@ document.getElementById('add-category-btn').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 
+// api stuff goes here
+
 document.getElementById('get-todos').addEventListener('click', () => {
     console.log('GET Todos clicked!');
     fetch('http://localhost:3003/api/todos')
@@ -325,11 +327,34 @@ document.getElementById('get-todos').addEventListener('click', () => {
         });
 });
 
+
+document.getElementById('get-categories').addEventListener('click', () => {
+    console.log('GET Categories clicked!');
+    fetch('http://localhost:3003/api/categories')
+        .then(res => res.json())
+        .then(data => {
+            console.log('API Response:', data);
+            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
+        });
+});
+
+
+document.getElementById('get-category-todos').addEventListener('click', () => {
+    console.log('GET Category Todos clicked!');
+    fetch('http://localhost:3003/api/categories/Personal/todos')
+        .then(res => res.json())
+        .then(data => {
+            console.log('API Response:', data);
+            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
+        });
+});
+
+
 document.getElementById('post-todo').addEventListener('click', () => {
     console.log('POST Todo clicked!');
     fetch('http://localhost:3003/api/todos', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             name: 'New Todo',
             status: 'Pending',
@@ -345,32 +370,44 @@ document.getElementById('post-todo').addEventListener('click', () => {
         });
 });
 
-document.getElementById('put-category').addEventListener('click', () => {
-    console.log('PUT Category clicked!');
-    fetch('http://localhost:3003/api/categories/0', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
+
+document.getElementById('post-category').addEventListener('click', () => {
+    console.log('POST Category clicked!');
+    fetch('http://localhost:3003/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            category: 'Updated Category'  
+            category: 'New Category'
         })
     })
-    .then(res => res.json())
-    .then(data => {
-        console.log('API Response:', data);
-        document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
-        renderCategories();
-    });
+        .then(res => res.json())
+        .then(data => {
+            console.log('API Response:', data);
+            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
+            renderCategories();
+        });
 });
 
 
-document.getElementById('delete-todo').addEventListener('click', () => {
-    console.log('DELETE Todo clicked!');
-    fetch('http://localhost:3003/api/todos/1', {
-        method: 'DELETE'
-    })
+document.getElementById('put-todo').addEventListener('click', () => {
+    console.log('PUT Todo clicked!');
+    fetch('http://localhost:3003/api/todos')
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const todoId = data[0].id;
+                return fetch(`http://localhost:3003/api/todos/${todoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Updated Todo',
+                        status: 'Completed',
+                        category: 'Personal',
+                        dueDate: 'Tomorrow'
+                    })
+                });
+            }
+        })
         .then(res => res.json())
         .then(data => {
             console.log('API Response:', data);
@@ -379,50 +416,14 @@ document.getElementById('delete-todo').addEventListener('click', () => {
         });
 });
 
-document.getElementById('get-category-todos').addEventListener('click', () => {
-    console.log('GET Category Todos clicked!');
-    fetch('http://localhost:3003/api/categories/Personal/todos')
-        .then(res => res.json())
-        .then(data => {
-            console.log('API Response:', data);
-            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
-        });
-});
-
-document.getElementById('get-categories').addEventListener('click', () => {
-    console.log('GET Categories clicked!');
-    fetch('http://localhost:3003/api/categories')
-        .then(res => res.json())
-        .then(data => {
-            console.log('API Response:', data);
-            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
-        });
-});
-
-document.getElementById('post-category').addEventListener('click', () => {
-    console.log('POST Category clicked!');
-    fetch('http://localhost:3003/api/categories', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            name: 'New Category'
-        })
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log('API Response:', data);
-            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
-            renderCategories();
-        });
-});
 
 document.getElementById('put-category').addEventListener('click', () => {
     console.log('PUT Category clicked!');
     fetch('http://localhost:3003/api/categories/0', {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            name: 'Updated Category'
+            category: 'Updated Category'
         })
     })
         .then(res => res.json())
@@ -433,11 +434,40 @@ document.getElementById('put-category').addEventListener('click', () => {
         });
 });
 
+
+document.getElementById('delete-todo').addEventListener('click', () => {
+    console.log('DELETE Todo clicked!');
+    fetch('http://localhost:3003/api/todos')
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const todoId = data[0].id;
+                return fetch(`http://localhost:3003/api/todos/${todoId}`, {
+                    method: 'DELETE'
+                });
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('API Response:', data);
+            document.getElementById('response-output').textContent = JSON.stringify(data, null, 2);
+            renderTodos();
+        });
+});
+
+
 document.getElementById('delete-category').addEventListener('click', () => {
     console.log('DELETE Category clicked!');
-    fetch('http://localhost:3003/api/categories/0', {
-        method: 'DELETE'
-    })
+    fetch('http://localhost:3003/api/categories')
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const categoryIndex = 0;
+                return fetch(`http://localhost:3003/api/categories/${categoryIndex}`, {
+                    method: 'DELETE'
+                });
+            }
+        })
         .then(res => res.json())
         .then(data => {
             console.log('API Response:', data);
