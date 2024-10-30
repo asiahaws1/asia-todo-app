@@ -173,3 +173,12 @@ select:focus {
   border-color: #4b54ba; 
   box-shadow: 0 0 5px rgba(97, 106, 213, 0.5); 
 }
+
+#response-output {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+  min-height: 100px;
+  white-space: pre-wrap;
+}
