@@ -236,6 +236,11 @@ function updateCategorySelects() {
     });
 }
 
+document.getElementById('add-todo-btn').addEventListener('click', () => {
+    addTodo();
+});
+
+
 document.getElementById('todo-input').addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         addTodo();
