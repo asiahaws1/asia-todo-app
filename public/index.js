@@ -236,6 +236,7 @@ function updateCategorySelects() {
     });
 }
 
+
 document.getElementById('add-todo-btn').addEventListener('click', () => {
     addTodo();
 });
@@ -259,6 +260,56 @@ function initializeApp() {
     renderCategories();
     renderTodos();
 }
+
+function filterTodosByCategory(category) {
+    if (category === 'All') {
+        renderTodos();
+    } else {
+        const filteredTodos = todos.filter(todo => todo.category === category);
+        renderTodos(filteredTodos);
+    }
+}
+
+
+function toggleEditCategory(index) {
+    const categoryElement = document.querySelectorAll('.category-item')[index];
+    const categoryName = categoryElement.querySelector('span');
+    const currentName = categoryName.textContent;
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentName;
+    
+    input.onblur = () => {
+        categories[index] = input.value;
+        saveCategoriesToLocalStorage();
+        renderCategories();
+    };
+    
+    categoryName.replaceWith(input);
+    input.focus();
+}
+
+function deleteCategory(index) {
+    categories.splice(index, 1);
+    saveCategoriesToLocalStorage();
+    renderCategories();
+}
+
+
+document.getElementById('add-category-btn').addEventListener('click', () => {
+    const input = document.getElementById('new-category-input');
+    const newCategory = input.value.trim();
+    
+    if (newCategory) {
+        categories.push(newCategory);
+        saveCategoriesToLocalStorage();
+        input.value = '';
+        renderCategories();
+    }
+});
+
+
 
 
 document.addEventListener('DOMContentLoaded', initializeApp);
