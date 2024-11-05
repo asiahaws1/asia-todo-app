@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const mongoose = require('mongoose');
+
 const app = express();
 
 
@@ -9,12 +11,24 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-let todos = [
-    { id: 1, name: 'Feed Dog', status: 'Pending', category: 'Personal', dueDate: 'Tonight' },
-    { id: 2, name: 'Meet with Stakeholders', status: 'Pending', category: 'Work', dueDate: 'Tomorrow' }
-];
+mongoose.connect('mongodb://localhost:27017/todoapp')
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-let categories = ['Personal', 'Work'];
+
+const todoSchema = new mongoose.Schema({
+    name: String,
+    status: String,
+    category: String,
+    dueDate: String
+});
+
+const categorySchema = new mongoose.Schema({
+    name: String
+});
+
+const Todo = mongoose.model('Todo', todoSchema);
+const Category = mongoose.model('Category', categorySchema);
 
 
 app.get('/', (req, res) => {
@@ -22,77 +36,118 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/api/todos', (req, res) => {
-    res.json(todos);
-});
-
-app.post('/api/todos', (req, res) => {
-    const newTodo = {
-        id: Date.now(),
-        ...req.body
-    };
-    todos.push(newTodo);
-    res.json(newTodo);
-});
-
-app.put('/api/todos/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = todos.findIndex(todo => todo.id === id);
-    if (index === -1) {
-        return res.status(404).json({ message: 'Todo not found' });
+app.get('/api/todos', async (req, res) => {
+    try {
+        const todos = await Todo.find();
+        res.json(todos);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    todos[index] = { ...todos[index], ...req.body };
-    res.json(todos[index]);
 });
 
-app.delete('/api/todos/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = todos.findIndex(todo => todo.id === id);
-    if (index === -1) {
-        return res.status(404).json({ message: 'Todo not found' });
+app.post('/api/todos', async (req, res) => {
+    try {
+        const newTodo = new Todo(req.body);
+        await newTodo.save();
+        res.json(newTodo);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    todos = todos.filter(todo => todo.id !== id);
-    res.json({ message: 'Todo deleted successfully' });
 });
 
-app.get('/api/categories/:category/todos', (req, res) => {
-    const categoryTodos = todos.filter(todo => todo.category === req.params.category);
-    res.json(categoryTodos);
-});
-
-
-app.get('/api/categories', (req, res) => {
-    res.json(categories);
-});
-
-app.post('/api/categories', (req, res) => {
-    if (!req.body.category) {
-        return res.status(400).json({ message: 'Need category name' });
+app.put('/api/todos/:id', async (req, res) => {
+    try {
+        const updatedTodo = await Todo.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+        if (!updatedTodo) {
+            return res.status(404).json({ message: 'Todo not found' });
+        }
+        res.json(updatedTodo);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    categories.push(req.body.category);
-    res.json({ category: req.body.category });
 });
 
-app.put('/api/categories/:index', (req, res) => {
-    const index = parseInt(req.params.index);
-    if (index >= categories.length || index < 0) {
-        return res.status(404).json({ message: 'category is not found' });
+app.delete('/api/todos/:id', async (req, res) => {
+    try {
+        const deletedTodo = await Todo.findByIdAndDelete(req.params.id);
+        if (!deletedTodo) {
+            return res.status(404).json({ message: 'Todo not found' });
+        }
+        await Todo.deleteOne({ _id: req.params.id });
+        res.json({ message: 'Todo deleted successfully', todo: deletedTodo });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    if (!req.body.category) {
-        return res.status(400).json({ message: 'Need category name' });
-    }
-    categories[index] = req.body.category;
-    res.json({ category: categories[index] });
 });
 
-app.delete('/api/categories/:index', (req, res) => {
-    const index = parseInt(req.params.index);
-    if (index >= categories.length || index < 0) {
-        return res.status(404).json({ message: 'category is not found' });
+
+
+app.get('/api/categories/:category/todos', async (req, res) => {
+    try {
+        const categoryTodos = await Todo.find({ category: req.params.category });
+        res.json(categoryTodos);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    const deletedCategory = categories[index];
-    categories.splice(index, 1);
-    res.json({ message: 'successfully deleted category', category: deletedCategory });
+});
+
+
+app.get('/api/categories', async (req, res) => {
+    try {
+        const categories = await Category.find();
+        res.json(categories.map(cat => cat.name));
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.post('/api/categories', async (req, res) => {
+    try {
+        if (!req.body.category) {
+            return res.status(400).json({ message: 'Category name required' });
+        }
+        const newCategory = new Category({ name: req.body.category });
+        await newCategory.save();
+        res.json({ category: newCategory.name });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+
+app.put('/api/categories/:name', async (req, res) => {
+    try {
+        const oldName = req.params.name;
+        const newName = req.body.category;
+        const updatedCategory = await Category.findOneAndUpdate(
+            { name: oldName },
+            { name: newName },
+            { new: true }
+        );
+        if (!updatedCategory) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        res.json({ category: updatedCategory.name });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+app.delete('/api/categories/:name', async (req, res) => {
+    try {
+        const deletedCategory = await Category.findOneAndDelete({ name: req.params.name });
+        if (!deletedCategory) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        await Todo.deleteMany({ category: req.params.name });
+        res.json({ message: 'Category deleted successfully', category: deletedCategory.name });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 const PORT = 3003;
